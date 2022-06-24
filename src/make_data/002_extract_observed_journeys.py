@@ -1,29 +1,29 @@
 """
 Extract Observed User Movements Across Domains
 
-This approach retrieves page hits that visit `www.gov.uk and a `seed_hosts` 
-domain(s) page in the same session, from Google BigQuery. It retrieves all page hits 
-in a session. 
+This approach retrieves page hits that visit `www.gov.uk and a `seed_hosts`
+domain(s) page in the same session, from Google BigQuery. It retrieves all page hits
+in a session.
 
-Assumptions: 
+Assumptions:
     - Only page hits are included
     - Print pages are not included
 
-Args: 
+Args:
     - start_date: String. The start date for the session hit data
     - end_date: String. The end date for the session hit data
     - seed_hosts: String. A list of URL slugs that host the cross-domain data
-    - remove_query_parameters: Boolean expression. Set to TRUE if query 
+    - remove_query_parameters: Boolean expression. Set to TRUE if query
         parameters in the slug following `?` are to be removed
 
-Returns: 
-    A pandas.DataFrame containing all page hits of sessions that visit a 
+Returns:
+    A pandas.DataFrame containing all page hits of sessions that visit a
     `seed_hosts` domain(s) and `www.gov.uk`
 
-Requirements: 
+Requirements:
     You must be able to use Google Cloud Platform through code
-    on your local machine and have the correct permissions to access 
-    `govuk-bigquery-analytics` project. 
+    on your local machine and have the correct permissions to access
+    `govuk-bigquery-analytics` project.
     See: https://docs.data-community.publishing.service.gov.uk/analysis/google-cloud-platform/#use-gcp-through-the-command-line-on-your-local-machine
 """
 
@@ -71,7 +71,7 @@ WITH
         SELECT DISTINCT
             sessionId
         FROM primary_data
-        WHERE hostname IN UNNEST(@seedHosts) 
+        WHERE hostname IN UNNEST(@seedHosts)
         GROUP BY sessionId, pagePath
     ),
 
@@ -88,10 +88,10 @@ WITH
 
     -- out of those sessions that visit at least one `seed_host`, which sessions also visit `www.gov.uk`
     distinct_sessions_all AS (
-        SELECT DISTINCT 
+        SELECT DISTINCT
             sessionId
         FROM all_hits_seed_host
-        WHERE hostname = 'www.gov.uk' 
+        WHERE hostname = 'www.gov.uk'
     )
 
     -- all page hits of sessions that also visit `www.gov.uk`

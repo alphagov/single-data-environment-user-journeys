@@ -13,10 +13,10 @@ between the structural, `G_structural`, and functional, `G_functional`, NetworkX
     - 004: Which nodes exist in both the functional and structural graph?
 
 Assumptions:
-    - For 002, source: target pairs where both are `www.gov.uk` are removed. When 
-      creating `G_functional`, all `www.gov.uk` hostname page hits are included. 
-      When creating `G_structural`, only `www.gov.uk` hostname page hits are included 
-      if they are hyperlinked from a page on `account.gov.uk` or `signin.account.gov.uk`. 
+    - For 002, source: target pairs where both are `www.gov.uk` are removed. When
+      creating `G_functional`, all `www.gov.uk` hostname page hits are included.
+      When creating `G_structural`, only `www.gov.uk` hostname page hits are included
+      if they are hyperlinked from a page on `account.gov.uk` or `signin.account.gov.uk`.
       Therefore, it is a fairer comparison to remove `www.gov.uk` source: target pairs.
 
 Requirements:
@@ -42,7 +42,7 @@ structural_dict = {}
 for u, v, a in G_structural.edges(data=True):
     structural_dict[u] = v, a
 
-# 001: Which edges exist in the functional network do not exist in the structural 
+# 001: Which edges exist in the functional network do not exist in the structural
 # network?
 edges_functional = {
     k: functional_dict[k]
@@ -51,7 +51,7 @@ edges_functional = {
 edges_functional
 len(edges_functional)
 
-# 002: Which edges exist in the functional network do not exist in the structural 
+# 002: Which edges exist in the functional network do not exist in the structural
 # network that do not include key: value pairs where both are `www.gov.uk`
 edges_functional_not_govuk = {
     k: v
@@ -61,7 +61,7 @@ edges_functional_not_govuk = {
 edges_functional_not_govuk
 len(edges_functional_not_govuk)
 
-# 003: Which edges exist in the structural network do not exist in the functional 
+# 003: Which edges exist in the structural network do not exist in the functional
 # network?
 edges_structural = {
     k: structural_dict[k]
