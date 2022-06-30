@@ -264,4 +264,4 @@ G_structural.nodes(data=True)
 G_structural.edges(data=True)
 
 # Save graph
-nx.write_gpickle(G_structural, "../data/processed/G_structural.gpickle")
+nx.write_gpickle(G_structural, "../../data/processed/G_structural.gpickle")

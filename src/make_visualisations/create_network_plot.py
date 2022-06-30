@@ -31,8 +31,8 @@ Prepare Data
 """
 
 # Load graphs
-G_structural = nx.read_gpickle("../data/processed/G_structural.gpickle")
-G_functional = nx.read_gpickle("../data/processed/G_functional.gpickle")
+G_structural = nx.read_gpickle("../../data/processed/G_structural.gpickle")
+G_functional = nx.read_gpickle("../../data/processed/G_functional.gpickle")
 
 # Remove nodes from `G_functional` that are not represented in `G_structural`
 functional_nodes_list = [node for node in G_functional.nodes()]
@@ -167,4 +167,4 @@ network_graph.inspection_policy = NodesAndLinkedEdges()
 # Render, display, and save plot
 plot.renderers.append(network_graph)
 show(plot)
-save(plot, filename=f"../data/processed/{title} plot.html")
+save(plot, filename=f"../../data/processed/{title} plot.html")

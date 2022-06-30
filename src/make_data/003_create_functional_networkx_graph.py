@@ -24,7 +24,7 @@ Requirements:
 import networkx as nx
 
 # Load data
-df = nx.read_gpickle("../data/interim/user_journeys_df.gpickle")
+df = nx.read_gpickle("../../data/interim/user_journeys_df.gpickle")
 
 # Combine hostname and sourcePagePath
 df["sourcePagePath"] = "https://" + df["hostname"] + df["pagePath"]
@@ -58,4 +58,4 @@ nx.info(G_functional)
 nx.draw(G_functional, with_labels=False)
 
 # Save graph
-nx.write_gpickle(G_functional, "../data/processed/G_functional.gpickle")
+nx.write_gpickle(G_functional, "../../data/processed/G_functional.gpickle")

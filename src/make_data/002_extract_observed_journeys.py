@@ -103,4 +103,4 @@ WITH
 """
 
 user_journeys_df = client.query(query, job_config=job_config).to_dataframe()
-user_journeys_df.to_pickle("../data/interim/user_journeys_df.gpickle")
+user_journeys_df.to_pickle("../../data/interim/user_journeys_df.gpickle")

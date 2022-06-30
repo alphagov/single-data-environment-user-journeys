@@ -30,8 +30,8 @@ Requirements:
 import networkx as nx
 
 # Load data
-G_structural = nx.read_gpickle("../data/processed/G_structural.gpickle")
-G_functional = nx.read_gpickle("../data/processed/G_functional.gpickle")
+G_structural = nx.read_gpickle("../../data/processed/G_structural.gpickle")
+G_functional = nx.read_gpickle("../../data/processed/G_functional.gpickle")
 
 # Prepare data: convert source and target nodes into key: value pairs
 functional_dict = {}
