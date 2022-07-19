@@ -29,21 +29,22 @@ def extract_observed_movements(start_date, end_date, seed_hosts, query_parameter
 
     Example
     -------
-    >>> extract_observed_movements('20220505', '20220506', ["account.gov.uk"],
-            query_parameters=False)
+    >>> user_journeys_df = extract_observed_movements("20220505", "20220506",
+                           ["account.gov.uk"], query_parameters=False)
+    >>> user_journeys_df
             sessionId	hitNumber	pagePath	                hostname
     0	    10154	    1	        /government/organisations	www.gov.uk
     1	    10154	    2	        /enter-email            	account.gov.uk
     2	    10154	    7	        /government/news/...	    www.gov.uk
-    3	    10154	    8	        /account-manage...	        account.gov.uk
-    ...	    ...	        ...	...	...
-    1284	98793	    5	        /government/organisatio...  www.gov.uk
-    1285	98793	    6	        /government/publication...	www.gov.uk
+    3	    10154	    8	        /account-manage 	        account.gov.uk
+    ...	    ...	        ...	        ...	                        ...
+    1284	98793	    5	        /government/organisations   www.gov.uk
+    1285	98793	    6	        /government/publication 	www.gov.uk
     1285	98793	    8	        /email/subscriptions...	    www.gov.uk
     1285	98793	    10	        /sign-in-or-create	        account.gov.uk
     1285	98793	    12	        /enter-email-create	        account.gov.uk
     """
-    # Construct a BigQuery client object, define query parameters
+    # Construct a BigQuery client object, and define query parameters
     client = bigquery.Client(project="govuk-bigquery-analytics")
 
     job_config = bigquery.QueryJobConfig(
@@ -118,7 +119,8 @@ def create_functional_network(user_journeys_df):
     """
     Create directed NetworkX functional graph.
 
-    Create a directed NetworkX functional graph based on observed user movements.
+    Create a directed NetworkX functional graph based on real, observed user
+    movements.
 
     Parameters
     ----------
@@ -129,14 +131,22 @@ def create_functional_network(user_journeys_df):
     Returns
     -------
     networkx.DiGraph
-        Directed NetworkX functional graph containing an edge list, e.g. the source
+        Directed NetworkX functional graph containing an edge list, i.e. the source
         page, target page, and edge attributes.
 
     Example
     -------
-    >>> user_journeys_df = pd.dataFrame()
-    >>> create_functional_network(user_journeys_df)
-
+    >>> data = {'sessionId': [10154, 10154, 10154, 98793, 98793],
+                'hitNumber': [1, 3, 5, 2, 6],
+                'pagePath': ['/enter-email', '/government/news/...',
+                    '/account-manage', '/government/publication',
+                    '/sign-in-or-create'],
+                'hostname': ['www.gov.uk', 'www.gov.uk', 'account.gov.uk',
+                    'www.gov.uk', 'account.gov.uk']}
+    >>> user_journeys_df = pd.DataFrame(data)
+    >>> G_functional = create_functional_network(user_journeys_df)
+    >>> nx.info(G_functional)
+    'DiGraph with 5 nodes and 3 edges'
     """
     df = user_journeys_df
 
