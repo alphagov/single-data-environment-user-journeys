@@ -1,14 +1,14 @@
 import networkx as nx
 
 
-def find_simple_paths(source, target, G, cutoff=None, verbose=1):
+def find_simple_paths(source, target, G, exclude_pages=None, cutoff=None, verbose=1):
     """
     Find all simple paths between all source and target pairs.
 
     A simple path is a path between the source and target node, with no repeated
     nodes. This function does not check that a path exists between source and
     target. There may be large number of simple paths in a graph. An example of
-    a source and target pair is source[0] and target[0], and not source[0] and 
+    a source and target pair is source[0] and target[0], and not source[0] and
     target[1].
 
     Parameters
@@ -18,6 +18,9 @@ def find_simple_paths(source, target, G, cutoff=None, verbose=1):
     target : list of str
         List of target nodes.
     G : NetworkX graph
+    exclude_pages : list of str, optional
+        Removes a simple path from the output if the path includes one one of
+        these pages.
     cutoff : int, optional
         Depth to stop the search. Only paths of length <= cutoff are returned.
     verbose : boolean, default '1'
@@ -35,7 +38,7 @@ def find_simple_paths(source, target, G, cutoff=None, verbose=1):
     >>> G = nx.from_dict_of_lists(data)
     >>> find_simple_paths(['www.gov.uk/', 'www.gov.uk/browse'],
                           ['www.gov.uk/browse', 'www.gov.uk/'],
-                          G, cutoff=1, verbose=0)
+                          G, cutoff=1, exclude_pages=None, verbose=0)
     [['www.gov.uk/', 'www.gov.uk/browse'],
     ['www.gov.uk/browse', 'www.gov.uk/']]
     """
@@ -48,6 +51,14 @@ def find_simple_paths(source, target, G, cutoff=None, verbose=1):
         )
         if verbose:
             print("Completed", ind + 1, "of", len(source))
+
+    # Remove paths that contain a page in the exclude_pages list
+    if exclude_pages:
+        all_simple_paths = [
+            path
+            for path in all_simple_paths
+            if not any(page in path for page in exclude_pages)
+        ]
 
     return all_simple_paths
 
