@@ -37,8 +37,8 @@ def create_bokeh_plot(
     Returns
     -------
     bokeh.plotting.figure
-        Bokeh plot object. Note: An HTML file will automatically open in a browser, 
-        containing the Bokeh plot of the observed user movements across the 
+        Bokeh plot object. Note: An HTML file will automatically open in a browser,
+        containing the Bokeh plot of the observed user movements across the
         structural network graph.
     """
     # Remove nodes from `G_functional` that are not represented in `G_structural`
