@@ -1,19 +1,19 @@
 import pandas as pd
 
 
-def format_journeys(G_functional, G_structural):
+def format_journeys(user_journeys_df, all_simple_paths):
     """
     Format functional and structural user journeys.
 
     Format structural intended journeys and functional user journeys to
-    correspond for further processing.
+    correspond into pandas.DataFrames for further processing.
 
     Parameters
     ----------
-    G_functional : pandas.DataFrame
+    user_journeys_df : pandas.DataFrame
         must include columns 'sessionId', 'pagePath', 'hostname'
-    G_structural : list of lists of str
-        each list represents a user journey, or a simple path
+    all_simple_paths : list of lists of str
+        each list represents the structural user journey, i.e. all simple paths
 
     Returns
     -------
@@ -53,11 +53,11 @@ def format_journeys(G_functional, G_structural):
     """
 
     # Create new df representing all functional pagePaths and count by sessionId
-    G_functional["sourcePagePath"] = (
-        "https://" + G_functional["hostname"] + G_functional["pagePath"]
+    user_journeys_df["sourcePagePath"] = (
+        "https://" + user_journeys_df["hostname"] + user_journeys_df["pagePath"]
     )
     functional_user_journeys = pd.DataFrame(
-        G_functional.groupby("sessionId")["sourcePagePath"].apply(" ".join)
+        user_journeys_df.groupby("sessionId")["sourcePagePath"].apply(", ".join)
     )
     functional_user_journeys = pd.DataFrame(
         functional_user_journeys.sourcePagePath.value_counts()
@@ -66,18 +66,13 @@ def format_journeys(G_functional, G_structural):
     ).rename(columns={"sourcePagePath": "countUserJourney"})
 
     # Create new df representing all structural pagePaths and count by sessionId
-    structural_user_journeys = []
-    for paths in G_structural:
-        path = [" ".join(paths)]
-        new_dict = dict.fromkeys(path, 0)
-        structural_user_journeys.append(new_dict)
+    structural_user_journeys = pd.DataFrame(columns=["userJourney", "userJourneyCount"])
 
-    structural_user_journeys = {
-        k: v for d in structural_user_journeys for k, v in d.items()
-    }
-    structural_user_journeys = pd.DataFrame(
-        structural_user_journeys.items(), columns=["userJourney", "countUserJourney"]
-    )
+    for idx, simple_path in enumerate(all_simple_paths):
+        structural_user_journeys.at[idx, "userJourney"] = simple_path
+        structural_user_journeys.at[idx, "userJourneyCount"] = 0
+
+    structural_user_journeys["userJourney"] = structural_user_journeys["userJourney"].str.join(", ")
 
     return (functional_user_journeys, structural_user_journeys)
 
@@ -101,7 +96,8 @@ def compare_journeys(functional_user_journeys, structural_user_journeys):
     same_journeys_df : pandas.DataFrame
         Provides the corresponding functional journey a structural journey
         appears in.
-
+    struct_journeys_appear : list
+        A list of the structural journeys that appear in the functional journeys.
     struct_journeys_not_appear : list
         A list of structural journeys that do not appear in the functional
         journeys.
@@ -116,12 +112,14 @@ def compare_journeys(functional_user_journeys, structural_user_journeys):
         ['www.gov.uk/sign-in-or-create www.gov.uk/enter-email',
         'www.gov.uk/sign-in www.gov.uk/email/manage www.gov.uk/signed-out'],
         'countUserJourney': [0, 0]})
-    >>> same_journeys_df, struct_journeys_not_appear =
+    >>> same_journeys_df, struct_journeys_appear, struct_journeys_not_appear =
         compare_journeys(functional_user_journeys, structural_user_journeys)
     >>> same_journeys_df
             structural journey	            functional journey
         0	www.gov.uk/sign-in-or-create    www.gov.uk/sign-in-or-create
             www.gov.uk/enter-email 	        www.gov.uk/enter-email
+    >>> struct_journeys_appear
+        ['www.gov.uk/sign-in-or-create www.gov.uk/enter-email']
     >>> struct_journeys_not_appear
         ['www.gov.uk/sign-in www.gov.uk/email/manage www.gov.uk/signed-out']
     """
@@ -140,9 +138,11 @@ def compare_journeys(functional_user_journeys, structural_user_journeys):
     same_journeys_df["structural journey"] = comparison1
     same_journeys_df["functional journey"] = comparison2
 
+    struct_journeys_appear = list(same_journeys_df["structural journey"].unique())
+
     # Structural journeys that do not appear in the functional journeys
     struct_journeys_not_appear = list(
         set(structural_user_journeys["userJourney"]) - set(comparison1)
     )
 
-    return (same_journeys_df, struct_journeys_not_appear)
+    return (same_journeys_df, struct_journeys_appear, struct_journeys_not_appear)
