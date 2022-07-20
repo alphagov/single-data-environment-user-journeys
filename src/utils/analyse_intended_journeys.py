@@ -72,7 +72,9 @@ def format_journeys(user_journeys_df, all_simple_paths):
         structural_user_journeys.at[idx, "userJourney"] = simple_path
         structural_user_journeys.at[idx, "userJourneyCount"] = 0
 
-    structural_user_journeys["userJourney"] = structural_user_journeys["userJourney"].str.join(", ")
+    structural_user_journeys["userJourney"] = structural_user_journeys[
+        "userJourney"
+    ].str.join(", ")
 
     return (functional_user_journeys, structural_user_journeys)
 
