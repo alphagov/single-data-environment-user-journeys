@@ -1,3 +1,5 @@
+import datetime
+
 import networkx as nx
 from google.cloud import bigquery
 
@@ -13,9 +15,9 @@ def extract_observed_movements(start_date, end_date, seed_hosts, query_parameter
     Parameters
     ----------
     start_date : str
-        Session hit data is extracted from this date.
+        Session hit data is extracted from this date, format YYYYMMDD.
     end_date : str
-        Session hit data is extracted to this date.
+        Session hit data is extracted to this date, format YYYYMMDD.
     seed_hosts : list of str
         A list of URL slugs that host the cross-domain data.
     query_parameters: boolean
@@ -44,6 +46,22 @@ def extract_observed_movements(start_date, end_date, seed_hosts, query_parameter
     1285	98793	    10	        /sign-in-or-create	        account.gov.uk
     1285	98793	    12	        /enter-email-create	        account.gov.uk
     """
+    # Raise error if start and/or end date is not a string in the following format YYYYMMDD
+    if type(start_date) != str or type(end_date) != str:
+        raise ValueError(
+            "start_date and end_date must be a string in the format YYYYMMDD"
+        )
+
+    try:
+        datetime.datetime.strptime(start_date, "%Y%m%d")
+    except ValueError:
+        raise ValueError("Incorrect start_date format, should be YYYYMMDD")
+
+    try:
+        datetime.datetime.strptime(end_date, "%Y%m%d")
+    except ValueError:
+        raise ValueError("Incorrect end_date format, should be YYYYMMDD")
+
     # Construct a BigQuery client object, and define query parameters
     client = bigquery.Client(project="govuk-bigquery-analytics")
 
