@@ -1,7 +1,9 @@
 import networkx as nx
 
 
-def find_simple_paths(source, target, G, include_pages=None, exclude_pages=None, cutoff=None, verbose=1):
+def find_simple_paths(
+    source, target, G, include_pages=None, exclude_pages=None, cutoff=None, verbose=1
+):
     """
     Find all simple paths between all source and target pairs.
 
@@ -48,7 +50,23 @@ def find_simple_paths(source, target, G, include_pages=None, exclude_pages=None,
     all_simple_paths = []
 
     for ind, url in enumerate(source):
-        # Loop through all source and target pairs
+        # check that the source URL is in the graph
+        if source[ind] not in G.nodes():
+            raise AssertionError(
+                f"Source URL {source[ind]} is not in the structural graph `G`"
+            )
+        # check that the target URL is in the graph
+        if target[ind] not in G.nodes():
+            raise AssertionError(
+                f"Target URL {target[ind]} is not in the structural graph `G`"
+            )
+        # check that there is at least 1 path between the source and target node
+        if not nx.has_path(G, source[ind], target[ind]):
+            raise AssertionError(
+                f"No path between source {source[ind]} and target {target[ind]}"
+            )
+
+        # find all simple paths for all source and target pairs
         all_simple_paths.extend(
             nx.all_simple_paths(G, source[ind], target[ind], cutoff)
         )
