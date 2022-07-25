@@ -1,7 +1,7 @@
 import networkx as nx
 
 
-def find_simple_paths(source, target, G, exclude_pages=None, cutoff=None, verbose=1):
+def find_simple_paths(source, target, G, include_pages=None, exclude_pages=None, cutoff=None, verbose=1):
     """
     Find all simple paths between all source and target pairs.
 
@@ -18,8 +18,10 @@ def find_simple_paths(source, target, G, exclude_pages=None, cutoff=None, verbos
     target : list of str
         List of target nodes.
     G : NetworkX graph
+    include_pages : list of str, default None
+        Only includes a simple path if the path contains one of these pages.
     exclude_pages : list of str, optional
-        Removes a simple path from the output if the path includes one one of
+        Removes a simple path from the output if the path includes one of
         these pages.
     cutoff : int, optional
         Depth to stop the search. Only paths of length <= cutoff are returned.
@@ -38,7 +40,8 @@ def find_simple_paths(source, target, G, exclude_pages=None, cutoff=None, verbos
     >>> G = nx.from_dict_of_lists(data)
     >>> find_simple_paths(['www.gov.uk/', 'www.gov.uk/browse'],
                           ['www.gov.uk/browse', 'www.gov.uk/'],
-                          G, cutoff=1, exclude_pages=None, verbose=0)
+                          G, cutoff=1, include_pages=None, exclude_pages=None,
+                          verbose=0)
     [['www.gov.uk/', 'www.gov.uk/browse'],
     ['www.gov.uk/browse', 'www.gov.uk/']]
     """
@@ -52,7 +55,15 @@ def find_simple_paths(source, target, G, exclude_pages=None, cutoff=None, verbos
         if verbose:
             print("Completed", ind + 1, "of", len(source))
 
-    # Remove paths that contain a page in the exclude_pages list
+    # Only include paths that contain any page in include_pages
+    if include_pages:
+        all_simple_paths = [
+            path
+            for path in all_simple_paths
+            if any(page in path for page in include_pages)
+        ]
+
+    # Remove paths that contain any page in exclude_pages
     if exclude_pages:
         all_simple_paths = [
             path
@@ -64,7 +75,7 @@ def find_simple_paths(source, target, G, exclude_pages=None, cutoff=None, verbos
 
 
 def rank_simple_paths(method, G, all_simple_paths, verbose=1):
-    """ "
+    """
     Rank the order of all simple paths by a given method.
 
     Parameters
