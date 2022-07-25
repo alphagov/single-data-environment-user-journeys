@@ -1,5 +1,6 @@
 import datetime
 
+import pandas as pd
 import networkx as nx
 from google.cloud import bigquery
 
@@ -46,9 +47,10 @@ def extract_observed_movements(start_date, end_date, seed_hosts, query_parameter
     1285	98793	    10	        /sign-in-or-create	        account.gov.uk
     1285	98793	    12	        /enter-email-create	        account.gov.uk
     """
-    # Raise error if start and/or end date is not a string in the following format YYYYMMDD
-    if type(start_date) != str or type(end_date) != str:
-        raise ValueError(
+    # Raise error if start and/or end date is not a string in the following format
+    # YYYYMMDD
+    if not isinstance(start_date, str) or not isinstance(end_date, str):
+        raise TypeError(
             "start_date and end_date must be a string in the format YYYYMMDD"
         )
 
@@ -166,7 +168,20 @@ def create_functional_network(user_journeys_df):
     >>> nx.info(G_functional)
     'DiGraph with 5 nodes and 3 edges'
     """
-    df = user_journeys_df
+    df = user_journeys_df.copy()
+
+    # Raise error if user_journeys_df is not a pandas.DataFrame with the columns
+    # sessionId, hitNumber, pagePath, hostname
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("user_journeys_df must be a pandas.DataFrame")
+
+    if not all(
+        col in df.columns for col in ["sessionId", "hitNumber", "pagePath", "hostname"]
+    ):
+        raise ValueError(
+            "user_journeys_df must be a pandas.DataFrame with the columns "
+            "sessionId, hitNumber, pagePath, hostname"
+        )
 
     # Combine hostname and sourcePagePath
     df["sourcePagePath"] = "https://" + df["hostname"] + df["pagePath"]
