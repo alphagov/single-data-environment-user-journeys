@@ -125,6 +125,18 @@ def rank_simple_paths(method, G, all_simple_paths, verbose=1):
     [['www.gov.uk/', 'www.gov.uk/browse'],
      ['www.gov.uk/', 'www.gov.uk/browse', 'www.gov.uk/childcare']]
     """
+    # If the method is not a specified metric, raise an error
+    if method not in [
+        "shortest",
+        "pageRank",
+        "betweenness",
+        "closeness",
+        "eigenvector",
+    ]:
+        raise AssertionError(
+            f"Method {method} is not a valid metric. Use 'shortest', 'pageRank', 'betweenness', 'closeness', or 'eigenvector'"
+        )
+
     # Rank by shortest path
     if method == "shortest":
         all_simple_paths.sort(key=len)
