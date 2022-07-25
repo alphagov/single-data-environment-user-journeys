@@ -11,9 +11,9 @@ def format_journeys(user_journeys_df, all_simple_paths):
     Parameters
     ----------
     user_journeys_df : pandas.DataFrame
-        must include columns 'sessionId', 'pagePath', 'hostname'
+        Must include columns 'sessionId', 'pagePath', 'hostname'
     all_simple_paths : list of lists of str
-        each list represents the structural user journey, i.e. all simple paths
+        Each list represents the structural user journey, i.e. all simple paths
 
     Returns
     -------
@@ -51,6 +51,17 @@ def format_journeys(user_journeys_df, all_simple_paths):
         https://www.gov.uk/email/manage
         https://www.gov.uk/signed-out
     """
+    # user_journeys_df must be a pandas.DataFrame object and contain the columns
+    # 'sessionId', 'pagePath', 'hostname', otherwise raise an error
+    if not isinstance(user_journeys_df, pd.DataFrame):
+        raise TypeError("user_journeys_df must be a pandas.DataFrame object")
+
+    if not all(
+        col in user_journeys_df.columns for col in ["sessionId", "pagePath", "hostname"]
+    ):
+        raise ValueError(
+            "user_journeys_df must contain the columns 'sessionId', 'pagePath', 'hostname'"
+        )
 
     # Create new df representing all functional pagePaths and count by sessionId
     user_journeys_df["sourcePagePath"] = (
@@ -125,6 +136,24 @@ def compare_journeys(functional_user_journeys, structural_user_journeys):
     >>> struct_journeys_not_appear
         ['www.gov.uk/sign-in www.gov.uk/email/manage www.gov.uk/signed-out']
     """
+    # If functional_user_journeys or structural_user_journeys are not a
+    # pandas.DataFrame object, or does not include the column 'userJourney',
+    # raise an error
+    if not isinstance(structural_user_journeys, pd.DataFrame):
+        raise TypeError("structural_user_journeys must be a pandas.DataFrame object")
+
+    if not isinstance(functional_user_journeys, pd.DataFrame):
+        raise TypeError("functional_user_journeys must be a pandas.DataFrame object")
+
+    if not all(col in structural_user_journeys.columns for col in ["userJourney"]):
+        raise ValueError(
+            "structural_user_journeys must contain the column 'userJourney'"
+        )
+    if not all(col in functional_user_journeys.columns for col in ["userJourney"]):
+        raise ValueError(
+            "functional_user_journeys must contain the column 'userJourney'"
+        )
+
     # Structural journeys that appear in the functional journeys
     comparison1 = []
     comparison2 = []
