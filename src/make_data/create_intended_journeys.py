@@ -133,7 +133,7 @@ def rank_simple_paths(method, G, all_simple_paths, verbose=1):
         "closeness",
         "eigenvector",
     ]:
-        raise AssertionError(
+        raise ValueError(
             f"Method {method} is not a valid metric. Use 'shortest', 'pageRank', 'betweenness', 'closeness', or 'eigenvector'"
         )
 
