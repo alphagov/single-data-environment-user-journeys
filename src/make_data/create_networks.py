@@ -168,7 +168,7 @@ def create_functional_network(user_journeys_df):
     >>> nx.info(G_functional)
     'DiGraph with 5 nodes and 3 edges'
     """
-    df = user_journeys_df.copy()
+    journeys_df = user_journeys_df.copy()
 
     # Raise error if user_journeys_df is not a pandas.DataFrame with the columns
     # sessionId, hitNumber, pagePath, hostname
@@ -184,21 +184,21 @@ def create_functional_network(user_journeys_df):
         )
 
     # Combine hostname and sourcePagePath
-    df["sourcePagePath"] = "https://" + df["hostname"] + df["pagePath"]
+    journeys_df["sourcePagePath"] = "https://" + journeys_df["hostname"] + journeys_df["pagePath"]
 
     # Find the destination pagePath
-    df["destinationPagePath"] = (
-        df.sort_values(by=["sessionId", "hitNumber"], ascending=True)
+    journeys_df["destinationPagePath"] = (
+        journeys_df.sort_values(by=["sessionId", "hitNumber"], ascending=True)
         .groupby(["sessionId"])["sourcePagePath"]
         .shift(-1)
     )
 
-    df = df[["sessionId", "sourcePagePath", "destinationPagePath"]]
+    journeys_stripped_df = journeys_df[["sessionId", "sourcePagePath", "destinationPagePath"]]
 
     # Count the number of user sessions that traverse from a sourcePagePath to
     # a destinationPagePath
-    df = (
-        df.groupby(["sourcePagePath", "destinationPagePath"], dropna=False)
+    journeys_stripped_df = (
+        journeys_stripped_df.groupby(["sourcePagePath", "destinationPagePath"], dropna=False)
         .sessionId.nunique()
         .reset_index(name="edgeWeight")
         .sort_values(by=["edgeWeight"], ascending=False)
